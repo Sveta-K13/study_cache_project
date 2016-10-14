@@ -1,0 +1,1 @@
+{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["import program from './program';\n\nprogram.init();\nprogram.run();\n"],"file":"index.js"}
