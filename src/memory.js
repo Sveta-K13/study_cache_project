@@ -1,8 +1,9 @@
+const memorySize = 20 * 1024;
 class Memory {
 
   constructor() {
     this.memory = [];
-    for (let i = 0; i < 20 * 1024; i++) {
+    for (let i = 0; i < memorySize; i++) {
       this.memory[i] = 0; // выделена под программу
     }
   }
@@ -40,4 +41,4 @@ class Memory {
 
 }
 
-export default new Memory();
+export default Memory;

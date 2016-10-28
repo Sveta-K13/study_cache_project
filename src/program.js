@@ -1,9 +1,9 @@
-import memory from './memory';
+import Memory from './memory';
 import Cache from './cache';
 
 const varsCount = 100;
 const arraysCount = 10;
-const arraysLength = 50;
+const arraysLength = 50; // для рандома от x до 2x
 const functionSizeL = 20;
 const functionSizeC = 10;
 
@@ -14,6 +14,7 @@ const p_func = 50;
 const p_funcL = 65;
 const p_funcC = 35;
 
+let memory = new Memory();
 
 class Program {
 
@@ -25,7 +26,6 @@ class Program {
     this.memory = memory;
     this.codeString = 0;
     this.cache = null;
-
   }
 
   init() {
@@ -34,10 +34,7 @@ class Program {
     this.placeArrays();
     this.placeFunction();
     this.workTime = 0;
-
     this.cache = new Cache(this.memory); // init fill cache
-
-    // console.log( this.vars, this.arrays, this.functionsL, this.functionsL);
   }
 
   run() {
@@ -56,10 +53,14 @@ class Program {
         }
       }
     }
-    console.log(this.cache.info);
+    /**  result info **/
+    const allOperation = this.cache.info.hit + this.cache.info.miss;
+    const hitted = this.cache.info.hit / allOperation;
+    const missed = this.cache.info.miss / allOperation;
+    console.log(`hit: ${hitted.toFixed(7)}%`, `miss: ${missed.toFixed(7)}%`);
     const now = new Date();
-    console.log('workTime: ms', (now.getTime() - start.getTime()));
-
+    console.log(`blocked: ${this.cache.info.blocked}`, ' WorkTime: ms', (now.getTime() - start.getTime()), '\n');
+    /*  result info */
   }
 
   executeFunction() {
@@ -134,4 +135,4 @@ class Program {
 
 }
 
-export default new Program();
+export default Program;

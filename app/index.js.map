@@ -1,1 +1,1 @@
-{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["import program from './program';\n\nprogram.init();\nprogram.run();\n"],"file":"index.js"}
+{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["import Program from './program';\n\n\n  let programs = [];\n  for (let i = 0; i < 4; i++) {\n    programs[i] = new Program();\n    programs[i].init();\n    programs[i].run();\n  }\n\n\n"],"file":"index.js"}

@@ -9,7 +9,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var interval = 1000;
+var cacheSize = 1024;
+var resetInterval = 1000; // reset requested bit
 var blockedInterval = 10;
 
 var Cache = function () {
@@ -24,7 +25,7 @@ var Cache = function () {
     };
     this.isBlocked = false;
     this.cache = [];
-    for (var i = 0; i < 1024; i++) {
+    for (var i = 0; i < cacheSize; i++) {
       this.cache[i] = {
         address: i,
         value: this.memory.get(i),
@@ -44,7 +45,7 @@ var Cache = function () {
           this.cache[i].requested = 1;
           setTimeout(function () {
             _this.cache[i].requested = 0;
-          }, interval);
+          }, resetInterval);
           return true;
         }
       }
@@ -53,7 +54,7 @@ var Cache = function () {
   }, {
     key: "findOldIndex",
     value: function findOldIndex() {
-      for (var i = 0; i < 1024 + 1; i++) {
+      for (var i = 0; i < cacheSize + 1; i++) {
         if (!this.cache[i].requested) return i;
         this.cache[i].requested = 0;
       }
@@ -77,7 +78,7 @@ var Cache = function () {
           };
           setTimeout(function () {
             _this2.cache[replaced].requested = 0;
-          }, interval);
+          }, resetInterval);
         })();
       }
     }
@@ -90,11 +91,11 @@ var Cache = function () {
         this.info.blocked += 1;
         setTimeout(function () {
           _this3.write(pos);
-        }, blockedInterval / 2);
+        }, blockedInterval / 2); // ждем когда можно записать
       } else {
         this.isBlocked = true;
         this.memory.set(pos, 1);
-        this.read(pos); // считаем, что тут перезаписывается значение в кэше, если было
+        this.read(pos); // считаем, что тут перезаписывается значение в кэше, даже если оно уже там есть
         setTimeout(function () {
           _this3.isBlocked = false;
         }, blockedInterval);
@@ -130,7 +131,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var varsCount = 100;
 var arraysCount = 10;
-var arraysLength = 50;
+var arraysLength = 50; // для рандома от x до 2x
 var functionSizeL = 20;
 var functionSizeC = 10;
 
@@ -141,6 +142,8 @@ var p_func = 50;
 var p_funcL = 65;
 var p_funcC = 35;
 
+var memory = new _memory2.default();
+
 var Program = function () {
   function Program() {
     _classCallCheck(this, Program);
@@ -149,7 +152,7 @@ var Program = function () {
     this.arrays = [];
     this.functionsL = [];
     this.functionsC = [];
-    this.memory = _memory2.default;
+    this.memory = memory;
     this.codeString = 0;
     this.cache = null;
   }
@@ -162,10 +165,7 @@ var Program = function () {
       this.placeArrays();
       this.placeFunction();
       this.workTime = 0;
-
       this.cache = new _cache2.default(this.memory); // init fill cache
-
-      // console.log( this.vars, this.arrays, this.functionsL, this.functionsL);
     }
   }, {
     key: 'run',
@@ -185,9 +185,14 @@ var Program = function () {
           }
         }
       }
-      console.log(this.cache.info);
+      /**  result info **/
+      var allOperation = this.cache.info.hit + this.cache.info.miss;
+      var hitted = this.cache.info.hit / allOperation;
+      var missed = this.cache.info.miss / allOperation;
+      console.log('hit: ' + hitted.toFixed(7) + '%', 'miss: ' + missed.toFixed(7) + '%');
       var now = new Date();
-      console.log('workTime: ms', now.getTime() - start.getTime());
+      console.log('blocked: ' + this.cache.info.blocked, ' WorkTime: ms', now.getTime() - start.getTime(), '\n');
+      /*  result info */
     }
   }, {
     key: 'executeFunction',
@@ -271,7 +276,7 @@ var Program = function () {
   return Program;
 }();
 
-exports.default = new Program();
+exports.default = Program;
 
 },{"./cache":1,"./memory":3}],3:[function(require,module,exports){
 "use strict";
@@ -284,12 +289,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var memorySize = 20 * 1024;
+
 var Memory = function () {
   function Memory() {
     _classCallCheck(this, Memory);
 
     this.memory = [];
-    for (var i = 0; i < 20 * 1024; i++) {
+    for (var i = 0; i < memorySize; i++) {
       this.memory[i] = 0; // выделена под программу
     }
   }
@@ -335,7 +342,7 @@ var Memory = function () {
   return Memory;
 }();
 
-exports.default = new Memory();
+exports.default = Memory;
 
 },{}]},{},[2])
 //# sourceMappingURL=program.js.map

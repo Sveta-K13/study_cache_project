@@ -9,12 +9,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var memorySize = 20 * 1024;
+
 var Memory = function () {
   function Memory() {
     _classCallCheck(this, Memory);
 
     this.memory = [];
-    for (var i = 0; i < 20 * 1024; i++) {
+    for (var i = 0; i < memorySize; i++) {
       this.memory[i] = 0; // выделена под программу
     }
   }
@@ -60,7 +62,7 @@ var Memory = function () {
   return Memory;
 }();
 
-exports.default = new Memory();
+exports.default = Memory;
 
 },{}]},{},[1])
 //# sourceMappingURL=memory.js.map

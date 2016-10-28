@@ -1,4 +1,5 @@
-const interval = 1000;
+const cacheSize = 1024;
+const resetInterval = 1000; // reset requested bit
 const blockedInterval = 10;
 
 class Cache {
@@ -11,7 +12,7 @@ class Cache {
     };
     this.isBlocked = false;
     this.cache = [];
-    for (let i = 0; i < 1024; i++) {
+    for (let i = 0; i < cacheSize; i++) {
       this.cache[i] = {
         address: i,
         value: this.memory.get(i),
@@ -25,7 +26,7 @@ class Cache {
     for (i = 0; i < this.cache.length; i++) {
       if (this.cache[i].address === pos) {
         this.cache[i].requested = 1;
-        setTimeout(() => { this.cache[i].requested = 0; }, interval);
+        setTimeout(() => { this.cache[i].requested = 0; }, resetInterval);
         return true;
       }
     }
@@ -33,7 +34,7 @@ class Cache {
   }
 
   findOldIndex() {
-    for (let i = 0; i < 1024 + 1; i++) {
+    for (let i = 0; i < cacheSize + 1; i++) {
       if (!this.cache[i].requested) return i;
       this.cache[i].requested = 0;
     }
@@ -51,7 +52,7 @@ class Cache {
         value: this.memory.get(pos),
         requested: 1,
       };
-      setTimeout(() => { this.cache[replaced].requested = 0; }, interval);
+      setTimeout(() => { this.cache[replaced].requested = 0; }, resetInterval);
     }
   }
 
@@ -60,11 +61,11 @@ class Cache {
       this.info.blocked += 1;
       setTimeout(() => {
         this.write(pos);
-      }, blockedInterval / 2);
+      }, blockedInterval / 2); // ждем когда можно записать
     } else {
       this.isBlocked = true;
       this.memory.set(pos, 1);
-      this.read(pos); // считаем, что тут перезаписывается значение в кэше, если было
+      this.read(pos); // считаем, что тут перезаписывается значение в кэше, даже если оно уже там есть
       setTimeout(() => { this.isBlocked = false; }, blockedInterval);
     }
   }
